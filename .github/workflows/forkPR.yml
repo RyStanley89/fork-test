@@ -12,14 +12,14 @@ jobs:
       - name: Check if PR is from a fork
         id: check-fork
         run: |
-          # Extract repository URLs and check if the pull request is from a fork
-          BASE_REPO_URL="${{ github.event.pull_request.base.repo.clone_url }}"
-          HEAD_REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
+          # Extract repository IDs and check if the pull request is from a fork
+          BASE_REPO_ID="${{ github.event.pull_request.base.repo.id }}"
+          HEAD_REPO_ID="${{ github.event.pull_request.head.repo.id }}"
           
-          echo "Base repository URL: $BASE_REPO_URL"
-          echo "Head repository URL: $HEAD_REPO_URL"
+          echo "Base repository ID: $BASE_REPO_ID"
+          echo "Head repository ID: $HEAD_REPO_ID"
 
-          if [[ "$BASE_REPO_URL" != "$HEAD_REPO_URL" ]]; then
+          if [[ "$BASE_REPO_ID" != "$HEAD_REPO_ID" ]]; then
             echo "PR is from a fork"
             echo "true" > is_fork.txt
           else
