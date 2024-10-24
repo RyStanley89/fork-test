@@ -12,14 +12,14 @@ jobs:
       - name: Check if PR is from a fork
         id: check-fork
         run: |
-          # Extract repository owner and check if the pull request is from a fork
-          BASE_REPO_OWNER=$(echo ${{ github.event.repository.full_name }} | cut -d'/' -f1)
-          HEAD_REPO_OWNER=$(echo ${{ github.event.pull_request.head.repo.full_name }} | cut -d'/' -f1)
+          # Extract repository URLs and check if the pull request is from a fork
+          BASE_REPO_URL="${{ github.event.pull_request.base.repo.clone_url }}"
+          HEAD_REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
           
-          echo "Base repository owner: $BASE_REPO_OWNER"
-          echo "Head repository owner: $HEAD_REPO_OWNER"
+          echo "Base repository URL: $BASE_REPO_URL"
+          echo "Head repository URL: $HEAD_REPO_URL"
 
-          if [[ "$BASE_REPO_OWNER" != "$HEAD_REPO_OWNER" ]]; then
+          if [[ "$BASE_REPO_URL" != "$HEAD_REPO_URL" ]]; then
             echo "PR is from a fork"
             echo "true" > is_fork.txt
           else
@@ -28,7 +28,7 @@ jobs:
           fi
 
       - name: Close PR if from a fork
-        if: steps.check-fork.outputs.is_fork == 'true'
+        if: ${{ steps.check-fork.outputs.is_fork == 'true' }}
         run: |
           echo "Closing the pull request because it's from a forked repository."
           curl -X POST \
@@ -38,7 +38,7 @@ jobs:
             -d '{"body": "Closing this pull request because it is from a forked repository.", "event": "REQUEST_CHANGES"}'
 
       - name: Close the pull request
-        if: steps.check-fork.outputs.is_fork == 'true'
+        if: ${{ steps.check-fork.outputs.is_fork == 'true' }}
         run: |
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
