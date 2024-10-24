@@ -1,47 +1,39 @@
-name: Close PRs from Forks
+name: Check PR Source
 
 on:
   pull_request_target:
     types: [opened]
 
 jobs:
-  check-pr-origin:
+  check-pr-source:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print PR source details
+        run: |
+          echo "Pull Request Source:"
+          echo "Base repository: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "Base repository owner: ${{ github.event.pull_request.base.repo.owner.login }}"
+          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+          
+          echo "Head repository: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "Head repository owner: ${{ github.event.pull_request.head.repo.owner.login }}"
+          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+
       - name: Check if PR is from a fork
         id: check-fork
         run: |
-          # Check the fork attribute of the head repository
-          HEAD_REPO_IS_FORK="${{ github.event.pull_request.head.repo.fork }}"
-          BASE_REPO_IS_FORK="${{ github.event.pull_request.base.repo.fork }}"
-          
-          echo "Head repository is a fork: $HEAD_REPO_IS_FORK"
-          echo "Base repository is a fork: $BASE_REPO_IS_FORK"
+          HEAD_REPO_OWNER="${{ github.event.pull_request.head.repo.owner.login }}"
+          BASE_REPO_OWNER="${{ github.event.pull_request.base.repo.owner.login }}"
 
-          if [[ "$HEAD_REPO_IS_FORK" == "true" ]]; then
-            echo "PR is from a fork"
+          if [[ "$HEAD_REPO_OWNER" != "$BASE_REPO_OWNER" ]]; then
+            echo "PR is from a fork."
             echo "true" >> $GITHUB_ENV
           else
-            echo "PR is from the same repository"
+            echo "PR is from the same repository."
             echo "false" >> $GITHUB_ENV
-          fi
 
-      - name: Close PR if from a fork
+      - name: Conditional action if from fork
         if: env.PR_IS_FORK == 'true'
         run: |
-          echo "Closing the pull request because it's from a forked repository."
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
-            -d '{"body": "Closing this pull request because it is from a forked repository.", "event": "REQUEST_CHANGES"}'
-
-      - name: Close the pull request
-        if: env.PR_IS_FORK == 'true'
-        run: |
-          curl -X PATCH \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} \
-            -d '{"state": "closed"}'
+          echo "This pull request is from a forked repository."
