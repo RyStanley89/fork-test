@@ -15,10 +15,20 @@ jobs:
           echo "Base repository: ${{ github.event.pull_request.base.repo.full_name }}"
           echo "Base repository owner: ${{ github.event.pull_request.base.repo.owner.login }}"
           echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Base is Fork: ${{ github.event.pull_request.base.repo.fork }}"
+          echo "Base forks url: ${{ github.event.pull_request.base.repo.forks_url }}"
+          echo "Base url: ${{ github.event.pull_request.base.repo.clone_url }}"
+          echo "Base repo id: ${{ github.event.pull_request.base.repo.id }}"
+
           
           echo "Head repository: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "Head repository owner: ${{ github.event.pull_request.head.repo.owner.login }}"
           echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Head is Fork: ${{ github.event.pull_request.head.repo.fork }}"
+          echo "Head forks url: ${{ github.event.pull_request.head.repo.forks_url }}"
+          echo "Head url: ${{ github.event.pull_request.head.repo.clone_url }}"
+          echo "Base repo id: ${{ github.event.pull_request.head.repo.id }}"
+
 
       - name: Check if PR is from a fork
         id: check-fork
