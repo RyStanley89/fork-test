@@ -14,8 +14,10 @@ jobs:
         run: |
           # Check the fork attribute of the head repository
           HEAD_REPO_IS_FORK="${{ github.event.pull_request.head.repo.fork }}"
+          BASE_REPO_IS_FORK="${{ github.event.pull_request.base.repo.fork }}"
           
           echo "Head repository is a fork: $HEAD_REPO_IS_FORK"
+          echo "Base repository is a fork: $BASE_REPO_IS_FORK"
 
           if [[ "$HEAD_REPO_IS_FORK" == "true" ]]; then
             echo "PR is from a fork"
